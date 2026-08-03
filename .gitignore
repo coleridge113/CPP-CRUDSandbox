@@ -1,0 +1,69 @@
+# ==========================================
+# Build Directories & Artifacts
+# ==========================================
+build/
+build-*/
+cmake-build-*/
+bin/
+lib/
+
+# CMake Generated Files
+CMakeFiles/
+CMakeCache.txt
+CMakeLists.txt.user
+cmake_install.cmake
+Makefile
+targets.cmake
+
+# FetchContent / External Dependencies (Crow source, etc.)
+_deps/
+
+# ==========================================
+# SQLite Database Files
+# ==========================================
+*.db
+*.sqlite
+*.sqlite3
+# SQLite Write-Ahead Logs & Journals
+*.db-wal
+*.db-shm
+*.db-journal
+
+# ==========================================
+# C++ / Compiler Artifacts
+# ==========================================
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.out
+
+# ==========================================
+# IDE & Editor Configurations
+# ==========================================
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# CLion / JetBrains
+.idea/
+
+# Vim / Emacs
+*.swp
+*.swo
+*~
+.#*
+
+# macOS System Files
+.DS_Store
+
+# Windows System Files
+Thumbs.db
+Desktop.in
