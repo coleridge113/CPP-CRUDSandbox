@@ -1,32 +1,60 @@
 cmake_minimum_required(VERSION 3.16)
-project(url_shortener CXX)
+project(crud_sandbox CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 1. Setup FetchContent
 include(FetchContent)
+
+# ------------------------------------------------------------------------------
+# Dependencies
+# ------------------------------------------------------------------------------
+
+# 1. System Libraries
+find_package(OpenSSL REQUIRED)
+find_package(SQLite3 REQUIRED)
+
+# 2. Crow HTTP Server
 FetchContent_Declare(
     Crow
     GIT_REPOSITORY https://github.com/CrowCpp/Crow.git
-    GIT_TAG        v1.3.3
+    GIT_TAG        v1.3.0
 )
 FetchContent_MakeAvailable(Crow)
 
-# 2. Define the executable FIRST
-add_executable(url_shortener src/main.cpp)
+# 3. JWT-CPP
+set(JWT_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(JWT_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 
-# 3. Now link libraries to the target you just created
-target_link_libraries(url_shortener PRIVATE Crow::Crow)
+FetchContent_Declare(
+    jwt-cpp
+    GIT_REPOSITORY https://github.com/Thalhammer/jwt-cpp.git
+    GIT_TAG        v0.7.0
+)
+FetchContent_MakeAvailable(jwt-cpp)
 
-find_package(SQLite3 REQUIRED)
-target_link_libraries(url_shortener PRIVATE SQLite3::SQLite3)
+# ------------------------------------------------------------------------------
+# Executable & Linking
+# ------------------------------------------------------------------------------
 
-# 4. Add the custom command
+add_executable(crud_sandbox src/main.cpp)
+
+target_link_libraries(crud_sandbox PRIVATE
+    Crow::Crow
+    jwt-cpp::jwt-cpp
+    SQLite3::SQLite3
+    OpenSSL::SSL
+    OpenSSL::Crypto
+)
+
+# ------------------------------------------------------------------------------
+# Custom Run Target
+# ------------------------------------------------------------------------------
+
 add_custom_target(run
-    COMMAND url_shortener
-    DEPENDS url_shortener
+    COMMAND crud_sandbox
+    DEPENDS crud_sandbox
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT "Running URL Shortener server..."
+    COMMENT "Running CRUD Sandbox server..."
 )
