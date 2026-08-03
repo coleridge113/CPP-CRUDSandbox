@@ -23,7 +23,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Crow)
 
-# 3. JWT-CPP
+# 3. Nlohmann JSON (Prevents jwt-cpp from fetching an outdated version)
+FetchContent_Declare(
+    nlohmann_json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG        v3.11.3
+)
+FetchContent_MakeAvailable(nlohmann_json)
+
+# 4. JWT-CPP
 set(JWT_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(JWT_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 
@@ -43,6 +51,7 @@ add_executable(crud_sandbox src/main.cpp)
 target_link_libraries(crud_sandbox PRIVATE
     Crow::Crow
     jwt-cpp::jwt-cpp
+    nlohmann_json::nlohmann_json
     SQLite3::SQLite3
     OpenSSL::SSL
     OpenSSL::Crypto
