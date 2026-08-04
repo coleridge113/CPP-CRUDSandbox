@@ -41,7 +41,7 @@ int main()
                     std::string username = json["username"].s();
                     std::string password = json["password"].s();
 
-                    auto token = jwtService.authenticateUser(username, password);
+                    auto token = JwtService::authenticateUser(username, password);
 
                     return crow::response(200, token);
 

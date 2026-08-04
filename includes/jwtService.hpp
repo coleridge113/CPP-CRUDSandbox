@@ -6,8 +6,11 @@
 
 class JwtService 
 {
+    private:
+        static inline const std::string secret = "my-secret-key";
+
     public:
-        std::string authenticateUser(
+        static const std::string authenticateUser(
                 std::string& username,
                 std::string& password
                 )
@@ -19,11 +22,11 @@ class JwtService
             auto token = jwt::create()
                 .set_type("JWS")
                 .set_issuer("crud-sandbox")
-                .set_payload_claim("user", jwt::claim(std::string(username)))
+                .set_payload_claim("name", jwt::claim(username))
                 .set_payload_claim("role", jwt::claim(std::string("user")))
                 .set_issued_at(issuedAt)
                 .set_expires_at(expiresAt)
-                .sign(jwt::algorithm::hs256{"secret"});
+                .sign(jwt::algorithm::hs256{secret});
 
             return token;
         }
