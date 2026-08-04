@@ -2,12 +2,14 @@
 #include <ostream>
 #include <string>
 #include <jwt-cpp/jwt.h>
+#include "../includes/jwtService.h"
 
 int main() 
 {
     try 
     {
         crow::SimpleApp app;
+        JwtService jwtService;
 
         CROW_ROUTE(app, "/api/greet")([]()
                 {
@@ -23,16 +25,26 @@ int main()
                         return crow::response(400, "Missing 'jwt' field in payload");
                     }
 
-                    try 
+                    std::string jwtToken = json["jwt"].s();
+                    auto decoded = jwt::decode(jwtToken);
+                    return crow::response(200, decoded.get_payload());
+                });
+
+        CROW_ROUTE(app, "/api/login").methods("POST"_method)([&jwtService](const crow::request& req)
+                {
+                    auto json = crow::json::load(req.body);
+                    if (!json || !json.has("username") || !json.has("password"))
                     {
-                        std::string jwtToken = json["jwt"].s();
-                        auto decoded = jwt::decode(jwtToken);
-                        return crow::response(200, decoded.get_payload());
+                        return crow::response(400, "Missing fields");
                     }
-                    catch (const std::exception& e)
-                    {
-                        return crow::response(400, "Invalid JWT: " + std::string(e.what()));
-                    }
+
+                    std::string username = json["username"].s();
+                    std::string password = json["password"].s();
+
+                    auto token = jwtService.authenticateUser(username, password);
+
+                    return crow::response(200, token);
+
                 });
 
         std::cout << "Server listening on http://localhost:18080" << '\n';
