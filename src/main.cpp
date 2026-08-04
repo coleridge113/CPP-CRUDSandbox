@@ -2,7 +2,7 @@
 #include <ostream>
 #include <string>
 #include <jwt-cpp/jwt.h>
-#include "../includes/jwtService.h"
+#include "../includes/jwtService.hpp"
 
 int main() 
 {
