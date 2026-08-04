@@ -9,7 +9,6 @@ int main()
     try 
     {
         crow::SimpleApp app;
-        JwtService jwtService;
 
         CROW_ROUTE(app, "/api/greet")([]()
                 {
@@ -30,7 +29,7 @@ int main()
                     return crow::response(200, decoded.get_payload());
                 });
 
-        CROW_ROUTE(app, "/api/login").methods("POST"_method)([&jwtService](const crow::request& req)
+        CROW_ROUTE(app, "/api/login").methods("POST"_method)([](const crow::request& req)
                 {
                     auto json = crow::json::load(req.body);
                     if (!json || !json.has("username") || !json.has("password"))
