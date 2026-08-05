@@ -2,22 +2,8 @@
 #include <ostream>
 #include <string>
 #include <jwt-cpp/jwt.h>
-#include <string_view>
 #include "../includes/jwtService.hpp"
-
-bool isAuthenticated(const crow::request& req)
-{
-    const std::string authHeader = req.get_header_value("Authorization");
-    constexpr std::string_view prefix = "Bearer ";
-    if (authHeader.rfind(prefix, 0) != 0)
-    {
-        return false;
-    }
-
-    std::string token = authHeader.substr(prefix.length());
-
-    return JwtService::validateJwt(token);
-}
+#include "../includes/utils.hpp"
 
 int main() 
 {
@@ -27,13 +13,13 @@ int main()
 
         CROW_ROUTE(app, "/api/greet")([](const crow::request& req)
                 {
-                    if (isAuthenticated(req))
+                    if (isAuthenticated(req) && isAuthenticated(req))
                     {
-                        return crow::response(401, "Unauthorized");
+                        return crow::response(200, "Hello world!");
                     } 
                     else 
                     {
-                        return crow::response(200, "Hello world!");
+                        return crow::response(401, "Unauthorized");
                     }
                 });
 
