@@ -1,13 +1,16 @@
 #include "crow/app.h"
+#include <memory>
 #include <ostream>
 #include <string>
 #include <jwt-cpp/jwt.h>
 #include "../includes/jwtService.hpp"
 #include "../includes/utils.hpp"
+#include "../includes/database.hpp"
 
 int main() 
 {
     crow::SimpleApp app;
+    auto sharedDb = std::make_shared<Database>("crud_db");
 
     CROW_ROUTE(app, "/api/greet")([](const crow::request& req)
             {
