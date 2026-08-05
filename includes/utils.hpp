@@ -5,37 +5,59 @@
 #include "jwtService.hpp"
 #include "models.hpp"
 
-inline std::string userTypeToString(UserType type)
+namespace utils
 {
-    switch (type)
+    inline std::string userTypeToString(UserType type)
     {
-        case UserType::GUEST:    return "guest";
-        case UserType::ADMIN:    return "admin";
-        case UserType::USER:     return "user";
+        switch (type)
+        {
+            case UserType::GUEST:    return "guest";
+            case UserType::ADMIN:    return "admin";
+            case UserType::USER:     return "user";
+        }
     }
-}
 
-inline bool isAuthenticated(const crow::request& req)
-{
-    const std::string authHeader = req.get_header_value("Authorization");
-    constexpr std::string_view prefix = "Bearer ";
+    inline std::string extractRole(const std::string& token)
+    {
+        try
+        {
+            const auto decoded = jwt::decode(token);
+            return decoded.get_payload_claim("role").as_string();
+        }
+        catch (const std::exception& e)
+        {
+            std::cerr << "Exception: " << e.what() << std::endl;
+            return "";
+        }
+    }
 
-    if (authHeader.rfind(prefix, 0) != 0) return false;
+    inline std::string extractToken(const crow::request& req)
+    {
+        const std::string authHeader = req.get_header_value("Authorization");
+        constexpr std::string_view prefix = "Bearer ";
 
-    std::string token = authHeader.substr(prefix.length());
+        if (authHeader.rfind(prefix, 0) != 0)
+        {  
+            return ""; 
+        }
+        else
+        {
+            return authHeader.substr(prefix.length());
+        }
+    }
 
-    return JwtService::validateJwt(token);
-}
+    inline bool isAuthenticated(const crow::request& req)
+    {
+        std::string token = extractToken(req);
+        return JwtService::validateJwt(token);
+    }
 
-inline bool isAuthorized(const crow::request& req)
-{
-    const std::string authHeader = req.get_header_value("Authorization");
-    constexpr std::string_view prefix = "Bearer ";
+    inline bool isAuthorized(const crow::request& req)
+    {
+        std::string token = extractToken(req);
+        auto decoded = jwt::decode(token);
 
-    if (authHeader.rfind(prefix, 0) != 0) return false;
+        return decoded.get_payload_claim("role").as_string() != userTypeToString(UserType::GUEST);
+    }
 
-    std::string token = authHeader.substr(prefix.length());
-    auto decoded = jwt::decode(token);
-
-    return decoded.get_payload_claim("role").as_string() != userTypeToString(UserType::GUEST);
 }

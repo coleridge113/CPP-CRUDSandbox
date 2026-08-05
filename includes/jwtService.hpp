@@ -50,18 +50,4 @@ namespace JwtService
             return false;
         }
     }
-
-    inline std::string extractRole(const std::string& token)
-    {
-        try
-        {
-            const auto decoded = jwt::decode(token);
-            return decoded.get_payload_claim("role").as_string();
-        }
-        catch (const std::exception& e)
-        {
-            std::cerr << "Exception: " << e.what() << std::endl;
-            return "";
-        }
-    }
 }

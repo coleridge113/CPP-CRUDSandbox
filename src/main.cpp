@@ -13,7 +13,7 @@ int main()
 
         CROW_ROUTE(app, "/api/greet")([](const crow::request& req)
                 {
-                    if (isAuthenticated(req) && isAuthenticated(req))
+                    if (utils::isAuthenticated(req) && utils::isAuthenticated(req))
                     {
                         return crow::response(200, "Hello world!");
                     } 
