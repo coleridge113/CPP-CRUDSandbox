@@ -1,8 +1,11 @@
 #pragma once
 
+#include <cassert>
 #include <memory>
+#include <optional>
 #include <sqlite3.h>
 #include "database.hpp"
+#include "models.hpp"
 #include "utils.hpp"
 
 class AuthService
@@ -22,5 +25,25 @@ class AuthService
         {
             std::string passwordHash = utils::hashPassword(password);
             return db_->insertCredentials(username, passwordHash, role);
+        }
+
+        const bool authenticateUser(
+                const std::string& username,
+                const std::string& password
+
+                )
+        {
+            std::optional<UserCredential> userOpt = db_->getCredentials(username);
+            std::string passwordHash = utils::hashPassword(password);
+            
+            if (userOpt)
+            {
+                return username == userOpt->username &&
+                 passwordHash == userOpt->passwordHash;
+            }
+            else
+            {
+                return false;
+            }
         }
 };

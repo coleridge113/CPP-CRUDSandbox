@@ -1,7 +1,9 @@
 #pragma once
 
+#include "models.hpp"
 #include <exception>
 #include <iostream>
+#include <optional>
 #include <sqlite3.h>
 #include <stdexcept>
 #include <string>
@@ -101,5 +103,47 @@ class Database
             sqlite3_finalize(stmt);
 
             return success;
+        }
+
+        const std::optional<UserCredential> getCredentials(const std::string& username)
+        {
+            const char* sql = R"(
+                SELECT * FROM user_credentials WHERE username = ?;
+            )";
+
+            sqlite3_stmt* stmt = nullptr;
+            if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK)
+            {
+                throw std::runtime_error("Invalid credentials!");
+            }
+            sqlite3_bind_text(stmt, 1, username.c_str(), -1, SQLITE_STATIC);
+
+            int result = sqlite3_step(stmt);
+            bool success = false;
+            UserCredential user;
+
+            if (result == SQLITE_ROW)
+            {
+                success = true;
+                const unsigned char* username = sqlite3_column_text(stmt, 1);
+                const unsigned char* passwordHash = sqlite3_column_text(stmt, 2);
+
+                user.username = username 
+                    ? reinterpret_cast<const char*>(username) 
+                    : "";
+                user.passwordHash = passwordHash 
+                    ? reinterpret_cast<const char*>(passwordHash) 
+                    : "";
+            }
+            else
+            {
+                success = false;
+                std::cerr << "Failed to fetch credentials: " << sqlite3_errmsg(db_) << std::endl;
+            }
+
+            sqlite3_finalize(stmt);
+
+            if (success) return user;
+            return std::nullopt;
         }
 };

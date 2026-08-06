@@ -40,7 +40,7 @@ int main()
                 return crow::response(200, decoded.get_payload());
             });
 
-    CROW_ROUTE(app, "/api/login").methods("POST"_method)([](const crow::request& req)
+    CROW_ROUTE(app, "/api/login").methods("POST"_method)([&authService](const crow::request& req)
             {
                 auto json = crow::json::load(req.body);
                 if (!json || !json.has("username") || !json.has("password"))
@@ -51,9 +51,16 @@ int main()
                 std::string username = json["username"].s();
                 std::string password = json["password"].s();
 
-                auto token = JwtService::authenticateUser(username, password);
 
-                return crow::response(200, token);
+                bool isValidated = authService.authenticateUser(username, password);
+                if (isValidated)
+                {
+                    return crow::response(200, "Welcome!");
+                }
+                else
+                {
+                    return crow::response(401, "Incorrect credentials!");
+                }
 
             });
 
