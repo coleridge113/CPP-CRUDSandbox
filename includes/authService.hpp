@@ -21,7 +21,7 @@ class AuthService
                 const std::string& username,
                 const std::string& password,
                 const std::string& role
-                )
+                ) const
         {
             std::string passwordHash = utils::hashPassword(password);
             return db_->insertCredentials(username, passwordHash, role);
@@ -31,19 +31,12 @@ class AuthService
                 const std::string& username,
                 const std::string& password
 
-                )
+                ) const
         {
             std::optional<UserCredential> userOpt = db_->getCredentials(username);
+            if (!userOpt) return false;
+
             std::string passwordHash = utils::hashPassword(password);
-            
-            if (userOpt)
-            {
-                return username == userOpt->username &&
-                 passwordHash == userOpt->passwordHash;
-            }
-            else
-            {
-                return false;
-            }
+            return passwordHash == userOpt->passwordHash;
         }
 };
