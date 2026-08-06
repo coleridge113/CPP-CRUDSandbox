@@ -17,7 +17,7 @@ class AuthService
         explicit AuthService(std::shared_ptr<Database> db)
             : db_(std::move(db)) {}
 
-        const bool registerUser(
+        bool registerUser(
                 const std::string& username,
                 const std::string& password,
                 const std::string& role
@@ -27,7 +27,7 @@ class AuthService
             return db_->insertCredentials(username, passwordHash, role);
         }
 
-        const bool authenticateUser(
+        bool authenticateUser(
                 const std::string& username,
                 const std::string& password
 

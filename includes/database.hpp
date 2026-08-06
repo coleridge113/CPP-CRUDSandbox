@@ -66,7 +66,7 @@ class Database
             if (db_) sqlite3_close_v2(db_);
         }
 
-        const bool insertCredentials(
+        bool insertCredentials(
                 const std::string& username, 
                 const std::string& passwordHash,
                 const std::string& role
