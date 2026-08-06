@@ -1,13 +1,18 @@
 #include "crow/app.h"
+#include <memory>
 #include <ostream>
 #include <string>
 #include <jwt-cpp/jwt.h>
 #include "../includes/jwtService.hpp"
 #include "../includes/utils.hpp"
+#include "../includes/database.hpp"
+#include "../includes/authService.hpp"
 
 int main() 
 {
     crow::SimpleApp app;
+    auto sharedDb = std::make_shared<Database>("crud_db");
+    AuthService authService(sharedDb);
 
     CROW_ROUTE(app, "/api/greet")([](const crow::request& req)
             {
@@ -50,6 +55,24 @@ int main()
 
                 return crow::response(200, token);
 
+            });
+
+    CROW_ROUTE(app, "/api/signup").methods("POST"_method)([&authService](const crow::request& req)
+            {
+                auto json = crow::json::load(req.body);
+                if (!json) return crow::response(400, "Missing payload");
+
+                std::string username = json["username"].s();
+                std::string password = json["password"].s();
+
+                if (authService.registerUser(username, password, "user"))
+                {
+                    return crow::response(200, "User has been registered");
+                }
+                else 
+                {
+                    return crow::response(500, "Failed to register user");
+                }
             });
 
     std::cout << "Server listening on http://localhost:18080" << '\n';

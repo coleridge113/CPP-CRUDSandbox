@@ -4,6 +4,8 @@
 #include "jwt-cpp/jwt.h"
 #include "jwtService.hpp"
 #include "models.hpp"
+#include <openssl/evp.h>
+#include <sstream>
 
 namespace utils
 {
@@ -60,4 +62,23 @@ namespace utils
         return decoded.get_payload_claim("role").as_string() != userTypeToString(UserType::GUEST);
     }
 
+    inline std::string hashPassword(const std::string& password)
+    {
+        unsigned char hash[EVP_MAX_MD_SIZE];
+        unsigned int lengthOfHash = 0;
+
+        EVP_MD_CTX* context = EVP_MD_CTX_new();
+        EVP_DigestInit_ex(context, EVP_sha256(), nullptr);
+        EVP_DigestUpdate(context, password.c_str(), password.size());
+        EVP_DigestFinal_ex(context, hash, &lengthOfHash);
+        EVP_MD_CTX_free(context);
+
+        std::stringstream ss;
+        for (unsigned int i = 0; i < lengthOfHash; ++i)
+        {
+            ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(hash[i]);
+        }
+
+        return ss.str();
+    }
 }
