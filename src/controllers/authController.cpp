@@ -29,13 +29,18 @@ crow::response AuthController::handleLogin(const crow::request& req)
 
 
     bool isValidated = authService_->authenticateUser(username, password);
+    crow::json::wvalue res;
     if (isValidated)
     {
-        return crow::response(200, "Welcome!");
+        std::string token = JwtService::authenticateUser(username);
+        res["token"] = token;
+        res["status"] = "success";
+        return crow::response(200, res);
     }
     else
     {
-        return crow::response(401, "Incorrect credentials!");
+        res["status"] = "error";
+        return crow::response(401, res);
     }
 }
 
