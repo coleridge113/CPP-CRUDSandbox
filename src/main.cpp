@@ -1,11 +1,10 @@
 #include "crow/app.h"
 #include <memory>
-#include <ostream>
 #include <string>
 #include <jwt-cpp/jwt.h>
 #include "../includes/utils.hpp"
-#include "../includes/database.hpp"
-#include "../includes/authService.hpp"
+#include "../includes/data/database.hpp"
+#include "../includes/service/authService.hpp"
 #include "./controllers/authController.cpp"
 
 int main() 

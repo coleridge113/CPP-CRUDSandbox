@@ -4,9 +4,9 @@
 #include <memory>
 #include <optional>
 #include <sqlite3.h>
-#include "database.hpp"
-#include "models.hpp"
-#include "utils.hpp"
+#include "../data/database.hpp"
+#include "../models.hpp"
+#include "../utils.hpp"
 
 class AuthService
 {
