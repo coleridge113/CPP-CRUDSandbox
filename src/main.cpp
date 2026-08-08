@@ -6,6 +6,7 @@
 #include "../includes/data/database.hpp"
 #include "../includes/service/authService.hpp"
 #include "./controllers/authController.cpp"
+#include "./controllers/messageController.cpp"
 
 int main() 
 {
@@ -13,8 +14,10 @@ int main()
     auto sharedDb = std::make_shared<Database>("crud_db");
     auto authService = std::make_shared<AuthService>(sharedDb);
     AuthController authController(authService);
+    MessageController messageController;
 
     authController.registerRoutes(app);
+    messageController.registerRoutes(app);
 
     CROW_ROUTE(app, "/api/greet")([](const crow::request& req)
             {

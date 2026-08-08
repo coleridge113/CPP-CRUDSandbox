@@ -6,6 +6,9 @@
 #include "models.hpp"
 #include <openssl/evp.h>
 #include <sstream>
+#include <string>
+
+using Instant = std::chrono::system_clock::time_point;
 
 namespace utils
 {
@@ -17,6 +20,8 @@ namespace utils
             case UserType::ADMIN:    return "admin";
             case UserType::USER:     return "user";
         }
+
+        return "unknown";
     }
 
     inline std::string extractRole(const std::string& token)
@@ -80,5 +85,19 @@ namespace utils
         }
 
         return ss.str();
+    }
+
+    inline Instant parseIsoToTimeStamp(const std::string& isoStr)
+    {
+        std::istringstream ss(isoStr);
+        Instant tp;
+
+        ss >> std::chrono::parse("%Y-%m-%dT%H:%M:%SZ", tp);
+
+        if (ss.fail())
+        {
+            return std::chrono::system_clock::now();
+        }
+        return tp;
     }
 }
