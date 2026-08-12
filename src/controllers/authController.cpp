@@ -53,13 +53,18 @@ crow::response AuthController::handleSignup(const crow::request& req)
     std::string username = json["username"].s();
     std::string password = json["password"].s();
 
+    crow::json::wvalue res;
+
     if (authService_->registerUser(username, password, "user"))
     {
-        return crow::response(200, "User has been registered");
+        res["status"] = "success";
+        return crow::response(200, res);
     }
     else 
     {
-        return crow::response(500, "Failed to register user");
+        res["status"] = "error";
+        res["message"] = "Failed to register user";
+        return crow::response(500, res);
     }
 
 }
