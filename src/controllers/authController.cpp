@@ -19,20 +19,21 @@ void AuthController::registerRoutes(crow::SimpleApp& app)
 crow::response AuthController::handleLogin(const crow::request& req) 
 {
     auto json = crow::json::load(req.body);
+    crow::json::wvalue res;
     if (!json || !json.has("username") || !json.has("password"))
     {
-        return crow::response(400, "Missing fields");
+        res["status"] = "error";
+        res["message"] = "Missing fields";
+        return crow::response(400, res);
     }
 
     std::string username = json["username"].s();
     std::string password = json["password"].s();
 
-
     bool isValidated = authService_->authenticateUser(username, password);
-    crow::json::wvalue res;
     if (isValidated)
     {
-        std::string token = JwtService::authenticateUser(username);
+        std::string token = JwtService::provideToken(username);
         res["token"] = token;
         res["status"] = "success";
         return crow::response(200, res);
