@@ -4,6 +4,8 @@
 #include "jwt-cpp/jwt.h"
 #include "./service/jwtService.hpp"
 #include "models.hpp"
+#include <chrono>
+#include <ctime>
 #include <openssl/evp.h>
 #include <sstream>
 #include <string>
@@ -87,17 +89,42 @@ namespace utils
         return ss.str();
     }
 
+    inline std::time_t portableTimegm(std::tm* tm)
+    {
+        std::time_t ret = std::mktime(tm);
+        if (ret == -1) return -1;
+
+        std::tm localTm{}, utcTm{};
+
+#if defined(_WIN32)
+        localtime_s(&localTm, &ret);
+        gmtime_s(&utcTm, &ret);
+#else
+        localtime_r(&ret, &localTm);
+        gmtime_r(&ret, &utcTm);
+#endif
+
+        std::time_t offset = std::mktime(&localTm) - std::mktime(&utcTm);
+        return ret + offset;
+    }
+
     inline Instant parseIsoToTimeStamp(const std::string& isoStr)
     {
         std::istringstream ss(isoStr);
-        Instant tp;
-
-        ss >> std::chrono::parse("%Y-%m-%dT%H:%M:%SZ", tp);
+        std::tm tm = {};
+        std::get_time(&tm, "%Y-%m-%dT%H:%M:%SZ");
 
         if (ss.fail())
         {
             return std::chrono::system_clock::now();
         }
-        return tp;
+
+        std::time_t timeT = portableTimegm(&tm);
+        if (timeT == -1)
+        {
+            return std::chrono::system_clock::now();
+        }
+
+        return std::chrono::system_clock::from_time_t(timeT);
     }
 }
