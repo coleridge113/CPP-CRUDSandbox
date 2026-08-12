@@ -12,10 +12,7 @@ namespace JwtService
     inline const std::string issuer = "crud-sandbox";
     inline const auto signingAlgorithm = jwt::algorithm::hs256{secretKey};
 
-    inline std::string authenticateUser(
-            const std::string& username,
-            const std::string& password
-            )
+    inline std::string authenticateUser(const std::string& username)
     {
         jwt::date issuedAt = std::chrono::system_clock::now();
         jwt::date expiresAt = issuedAt + std::chrono::hours(24);
